@@ -8,6 +8,7 @@ const CommentController = {
                 return Pizza.findOneAndUpdate(
                     { _id: params.pizzaId },
                     { $push: { comments: _id } },
+                    //addToSet will do the same as push but prevent duplicates
                     { new: true }
                 );
             })
@@ -20,7 +21,30 @@ const CommentController = {
             })
             .catch(err => res.json(err));
     },
-
+    addReply({ params, body }, res) {
+        Comment.findOneAndUpdate(
+          { _id: params.commentId },
+          { $push: { replies: body } },
+          { new: true }
+        )
+          .then(gimmePizza => {
+            if (!gimmePizza) {
+              res.status(404).json({ message: 'No pizza found with this id!' });
+              return;
+            }
+            res.json(gimmePizza);
+          })
+          .catch(err => res.json(err));
+      },
+removeReply({ params }, res) {
+    Comment.findOneAndUpdate(
+      { _id: params.commentId },
+      { $pull: { replies: { replyId: params.replyId } } },
+      { new: true }
+    )
+      .then(dbPizzaData => res.json(dbPizzaData))
+      .catch(err => res.json(err));
+  },
     removeComment({ params }, res) {
         Comment.findOneAndDelete({ _id: params.commentId })
             .then(deletedComment => {
