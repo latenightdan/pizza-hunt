@@ -9,7 +9,7 @@ const CommentController = {
                     { _id: params.pizzaId },
                     { $push: { comments: _id } },
                     //addToSet will do the same as push but prevent duplicates
-                    { new: true }
+                    { new: true, runValidators: true }
                 );
             })
             .then(gimmePizza => {
@@ -25,7 +25,7 @@ const CommentController = {
         Comment.findOneAndUpdate(
           { _id: params.commentId },
           { $push: { replies: body } },
-          { new: true }
+          { new: true, runValidators: true }
         )
           .then(gimmePizza => {
             if (!gimmePizza) {
